@@ -1,13 +1,16 @@
 import cv2
 import numpy as np
 import copy
+import os
+import re
+
 
 #Crop ROI coordinates
 x1, y1 = 0, 0	
 x2, y2 = 0, 0
 
 #img is the image read in from external file
-img = cv2.imread("testing.png")
+img = cv2.imread("largetest.png")
 
 #Track if mouse is held down
 down = False
@@ -31,6 +34,8 @@ if(dy2 >= resolutiony):
 
 #Increment display view by
 inc = 10
+num = -1
+
 
 #preview shows highlighted area
 preview = None
@@ -39,63 +44,80 @@ preview = None
 ref = copy.copy(img) #pointer to original image
 
 
+# find file number
+def find_clipno():
+
+	global num
+
+	for fi in os.listdir('.'):
+		if os.path.isfile(fi):
+			
+		
+
+
+
 # mouse callback function
 def draw_rect(event,x,y,flags,param):
-
+	
         global x2,x1,y2,y1,down, preview, img
 
         if event == cv2.EVENT_MOUSEMOVE and down == True:
-			img = copy.copy(ref) #point display back to original
-			x2, y2 = x, y
-			#Offset - keep up with what is being displayed
-			cv2.rectangle(img, (x1 + dx1,y1 + dy1), (x2 + dx1, y2 + dy1), (0,255,0), 2)
+                img = copy.copy(ref) #point display back to original
+                x2, y2 = x, y
+
+		#Offset - keep up with what is being displayed
+                cv2.rectangle(img, (x1 + dx1,y1 + dy1), (x2 + dx1, y2 + dy1), (0,255,0), 2)
 
         if event == cv2.EVENT_LBUTTONDOWN:
                 x1, y1 = x,y 
                 down = True
 
-
         if event == cv2.EVENT_LBUTTONUP:
-			img = copy.copy(ref) #point display back to original
-			x2 = x
-			y2 = y
+                img = copy.copy(ref) #point display back to original
+                x2 = x
+                y2 = y
 
-		#Check points, in case rectangle has been drawn bottom to top
-			if(x2 < x1 and y2 < y1):
-				x1,x2 = x2,x1
-				y1,y2 = y2,y1
+                #Check points, in case rectangle has been drawn bottom to top
+                if(x2 < x1 and y2 < y1):
+			x1,x2 = x2,x1
+			y1,y2 = y2,y1
 
 		#And again for top right to bottom left
-			elif(x1 > x2 and y1 < y2):
-				diff = x1 - x2
-				x1,x2 = x1 - diff, x2 + diff
-
-		#And last for bottom left to top right
-			if(y1 > y2 and x1 < x2):
-				diff = y1 - y2
-				y1,y2 = y1 - diff, y2 + diff
-
-			preview = ref[y1+dy1:y2+dy1,x1+dx1:x2+dx1]
-			cv2.rectangle(img, (x1 + dx1,y1 + dy1), (x2 + dx1, y2 + dy1), (0,255,0), 2) #draw end rect
-			cv2.destroyWindow('preview')
-			down = False
-
+		elif(x1 > x2 and y1 < y2):
+			diff = x1 - x2
+			x1,x2 = x1 - diff, x2 + diff
 			
+		#And last for bottom left to top right
+		if(y1 > y2 and x1 < x2):
+			diff = y1 - y2
+			y1,y2 = y1 - diff, y2 + diff
+
+		
+                cv2.rectangle(img, (x1 + dx1,y1 + dy1), (x2 + dx1, y2 + dy1), (0,255,0), 1) #draw end rect
+
+		#Offset crop as well
+                preview = img[y1+dy1:y2+dy1,x1+dx1:x2+dx1]
+		down = False
+
+
 
 cv2.namedWindow('display')
 cv2.namedWindow('preview')
 cv2.resizeWindow('display', resolutionx, resolutiony)
 cv2.setMouseCallback('display',draw_rect)
 
+find_clipno()
+
 #Display loop / key handler
 while(True):
 
 	cv2.imshow('display',img[dy1:dy2,dx1:dx2])
 
+
 	key = cv2.waitKey(20)
 
         if (preview != None):
-			cv2.imshow('preview', preview)
+                cv2.imshow('preview', preview)
 
         if (key & 0xFF == 119):
                 #Move Up - decrease y
@@ -106,6 +128,7 @@ while(True):
 			dy1  -= inc
 			dy2 -= inc
 		print dy1,dy2
+
 
 
         if (key & 0xFF == 115):	
@@ -142,7 +165,7 @@ while(True):
                 break
 
         if (key & 0xFF == 120):
-                cv2.imwrite('Result.png',preview)
+                cv2.imwrite('Clip' + str(num) + '.png',preview)
 
 
 cv2.destroyAllWindows()
@@ -185,6 +208,14 @@ cv2.destroyAllWindows()
 
 # Fixed offsetting selection area / preview with display
 
+
+
+
+
+
+
+
+# Look into cropping multiple times
 # Look into dragging image using mouse 
 # Look into zooming in / zooming out for easier selection + traversal
 
