@@ -94,7 +94,7 @@ while (True):
     if (preview is not None ):
         cv2.imshow('preview', preview)
 
-    if (key & 0xFF == 119):
+    if (key & 0xFF == 119): ##w key press
         # Move Up - decrease y
         if ((dy1 - inc) <= 0):
             dy2 -= dy1
@@ -104,7 +104,7 @@ while (True):
             dy2 -= inc
         print(dy1, dy2)
 
-    if (key & 0xFF == 115):
+    if (key & 0xFF == 115): #s key press
         # MOVE DOWN - increase y
         if ((dy2 + inc) >= sy):
             dy1 += sy - dy2
@@ -114,7 +114,7 @@ while (True):
             dy1 += inc
         print(dy1, dy2)
 
-    if (key & 0xFF == 97):
+    if (key & 0xFF == 97): #a key press
         # MOVE LEFT - decrease x
         if ((dx1 - inc) <= 0):
             dx2 -= dx1
@@ -124,7 +124,7 @@ while (True):
             dx2 -= inc
         print(dx1, dx2)
 
-    if (key & 0xFF == 100):
+    if (key & 0xFF == 100): #d keypress
         # MOVE RIGHT
         if ((dx2 + inc) >= sx):
             dx1 += sx - dx2
@@ -134,11 +134,12 @@ while (True):
             dx1 += inc
         print(dx1, dx2)
 
-    if (key & 0xFF == 27):
+    if (key & 0xFF == 27): #esc key press
         break
 
-    if (key & 0xFF == 120):
-        cv2.imwrite('Result.png', preview)
+    if (key & 0xFF == 120): #x key press
+        cv2.imwrite('MyImg.png', preview)
+
 
 cv2.destroyAllWindows()
 
